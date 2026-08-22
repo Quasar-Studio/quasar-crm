@@ -1,10 +1,7 @@
 import { type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
-import {
-  type TimelineActivityAction,
-  type TimelineActivityRenderer,
-} from 'twenty-shared/timeline';
+import { type TimelineActivityAction } from 'twenty-shared/timeline';
 
 export type StandardTimelineActivityTypeDefinition = {
   name: string;
@@ -12,13 +9,13 @@ export type StandardTimelineActivityTypeDefinition = {
   label: MessageDescriptor;
   action: TimelineActivityAction | null;
   icon: string | null;
-  renderer: TimelineActivityRenderer | null;
+  frontComponentUniversalIdentifier: string | null;
   objectUniversalIdentifier: string | null;
 };
 
 // The vocabulary a timeline row is stamped from. Types carrying an object are
-// preferred for events about that object's records, so a note link renders
-// through its own component; the ones carrying none are the fallback for every
+// preferred for events about that object's records, so its label and icon can
+// describe the linked object; the ones carrying none are the fallback for every
 // other object and for a record's own changes. The stored `name` column these
 // replace conflated the action with the source object and could not tell a
 // linked record being deleted from the link itself being removed.
@@ -33,7 +30,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'created',
       icon: 'IconCirclePlus',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -45,7 +42,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'updated',
       icon: 'IconEditCircle',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -57,7 +54,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'deleted',
       icon: 'IconTrash',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -69,7 +66,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'restored',
       icon: 'IconRestore',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -81,7 +78,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'linked',
       icon: 'IconLink',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -93,7 +90,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'unlinked',
       icon: 'IconUnlink',
-      renderer: null,
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: null,
     },
     {
@@ -105,7 +102,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'linked',
       icon: 'IconLink',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.note.universalIdentifier,
     },
     {
@@ -117,7 +114,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'unlinked',
       icon: 'IconUnlink',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.note.universalIdentifier,
     },
     {
@@ -129,7 +126,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'updated',
       icon: 'IconEditCircle',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.note.universalIdentifier,
     },
     {
@@ -141,7 +138,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'linked',
       icon: 'IconLink',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.task.universalIdentifier,
     },
     {
@@ -153,7 +150,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'unlinked',
       icon: 'IconUnlink',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.task.universalIdentifier,
     },
     {
@@ -165,7 +162,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'updated',
       icon: 'IconEditCircle',
-      renderer: 'activity',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.task.universalIdentifier,
     },
     {
@@ -177,7 +174,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'linked',
       icon: 'IconMail',
-      renderer: 'message',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier: STANDARD_OBJECTS.message.universalIdentifier,
     },
     {
@@ -189,7 +186,7 @@ export const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITIONS: StandardTimelineActivi
       }),
       action: 'linked',
       icon: 'IconCalendar',
-      renderer: 'calendarEvent',
+      frontComponentUniversalIdentifier: null,
       objectUniversalIdentifier:
         STANDARD_OBJECTS.calendarEvent.universalIdentifier,
     },

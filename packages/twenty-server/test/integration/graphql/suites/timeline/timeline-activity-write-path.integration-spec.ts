@@ -9,13 +9,16 @@ import { gql } from 'graphql-tag';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { makeMetadataAPIRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
 import { waitForAllJobsToFinish } from 'test/integration/utils/wait-for-all-jobs-to-finish.util';
-import { type TimelineActivityAction } from 'twenty-shared/timeline';
+import {
+  type TimelineActivityAction,
+  type TimelineActivityTypeSnapshot,
+} from 'twenty-shared/timeline';
 import { isDefined } from 'twenty-shared/utils';
 
 const TIMELINE_ACTIVITY_GQL_FIELDS = `
   id
-  name
   timelineActivityTypeId
+  timelineActivityTypeSnapshot
   properties
   linkedRecordId
   linkedRecordCachedName
@@ -28,8 +31,8 @@ const TIMELINE_ACTIVITY_GQL_FIELDS = `
 
 type TimelineActivityRow = {
   id: string;
-  name: string | null;
-  timelineActivityTypeId: string | null;
+  timelineActivityTypeId: string;
+  timelineActivityTypeSnapshot: TimelineActivityTypeSnapshot;
   properties: Record<string, unknown> | null;
   linkedRecordId: string | null;
   linkedRecordCachedName: string | null;
@@ -104,18 +107,6 @@ const findTimelineActivities = async (
 
 const TEST_SCHEMA_NAME = 'workspace_1wgvd1injqtife6y4rvfbu3h5';
 
-const expectDeprecatedNameNotToBeStored = async (
-  timelineActivityId: string,
-): Promise<void> => {
-  const [timelineActivity]: { name: string | null }[] =
-    await global.testDataSource.query(
-      `SELECT "name" FROM "${TEST_SCHEMA_NAME}"."timelineActivity" WHERE "id" = $1`,
-      [timelineActivityId],
-    );
-
-  expect(timelineActivity.name).toBeNull();
-};
-
 const findTimelineActivityRowsByLinkedRecordId = async ({
   timelineActivityTypeId,
   linkedRecordId,
@@ -167,7 +158,6 @@ const NOTE_UNIVERSAL_IDENTIFIER = STANDARD_OBJECTS.note.universalIdentifier;
 
 const COMPANY_ID = '20202020-7171-4000-8000-000000000001';
 const POSITION_COMPANY_ID = '20202020-7171-4000-8000-000000000002';
-const MERGE_COMPANY_ID = '20202020-7171-4000-8000-000000000003';
 const NOTE_COMPANY_ID = '20202020-7171-4000-8000-000000000004';
 const NOTE_ID = '20202020-7171-4000-8000-000000000005';
 const NOTE_TARGET_ID = '20202020-7171-4000-8000-000000000006';
@@ -187,14 +177,12 @@ const CREATED_RECORD_IDS: { objectMetadataSingularName: string; id: string }[] =
       id,
     })),
     { objectMetadataSingularName: 'company', id: NOTE_COMPANY_ID },
-    { objectMetadataSingularName: 'company', id: MERGE_COMPANY_ID },
     { objectMetadataSingularName: 'company', id: POSITION_COMPANY_ID },
     { objectMetadataSingularName: 'company', id: COMPANY_ID },
   ];
 
 // Pins the write-path behavior that the timeline activity rule engine must
-// reproduce. Assertions describe what the hardcoded implementation does today,
-// including the parts that look accidental.
+// reproduce.
 describe('timeline activity write path (integration)', () => {
   beforeAll(async () => {
     const response = await makeMetadataAPIRequest({
@@ -247,9 +235,10 @@ describe('timeline activity write path (integration)', () => {
       expect(timelineActivities[0].timelineActivityTypeId).toBe(
         timelineActivityTypeIdForOrThrow('created'),
       );
-      // Nullable text is exposed as its empty-string equivalent by TwentyORM.
-      expect(timelineActivities[0].name).toBe('');
-      await expectDeprecatedNameNotToBeStored(timelineActivities[0].id);
+      expect(timelineActivities[0].timelineActivityTypeSnapshot).toMatchObject({
+        id: timelineActivityTypeIdForOrThrow('created'),
+        action: 'created',
+      });
       expect(timelineActivities[0].targetCompanyId).toBe(COMPANY_ID);
       expect(timelineActivities[0].linkedRecordId).toBeNull();
     });
@@ -277,69 +266,6 @@ describe('timeline activity write path (integration)', () => {
             before: 'Timeline Write Path',
             after: 'Timeline Write Path Renamed',
           },
-        },
-      });
-    });
-
-    it('should merge into a recent name-only entry written by an older server', async () => {
-      await createRecord({
-        objectMetadataSingularName: 'company',
-        data: {
-          id: MERGE_COMPANY_ID,
-          name: 'Merge Window',
-        },
-      });
-
-      await updateRecord({
-        objectMetadataSingularName: 'company',
-        recordId: MERGE_COMPANY_ID,
-        data: {
-          name: 'Merge Window Once',
-        },
-      });
-      await waitForAllJobsToFinish();
-
-      const [timelineActivityWrittenByCurrentServer] =
-        await findTimelineActivities({
-          targetCompanyId: { eq: MERGE_COMPANY_ID },
-          timelineActivityTypeId: {
-            eq: timelineActivityTypeIdForOrThrow('updated'),
-          },
-        });
-
-      expect(timelineActivityWrittenByCurrentServer.name).toBe('');
-      await expectDeprecatedNameNotToBeStored(
-        timelineActivityWrittenByCurrentServer.id,
-      );
-
-      await global.testDataSource.query(
-        `UPDATE "${TEST_SCHEMA_NAME}"."timelineActivity" SET "name" = $1, "timelineActivityTypeId" = NULL WHERE "id" = $2`,
-        ['company.updated', timelineActivityWrittenByCurrentServer.id],
-      );
-
-      await updateRecord({
-        objectMetadataSingularName: 'company',
-        recordId: MERGE_COMPANY_ID,
-        data: {
-          name: 'Merge Window Twice',
-        },
-      });
-
-      const timelineActivities = await findTimelineActivities({
-        targetCompanyId: { eq: MERGE_COMPANY_ID },
-        timelineActivityTypeId: {
-          eq: timelineActivityTypeIdForOrThrow('updated'),
-        },
-      });
-
-      expect(timelineActivities).toHaveLength(1);
-      expect(timelineActivities[0].id).toBe(
-        timelineActivityWrittenByCurrentServer.id,
-      );
-      expect(timelineActivities[0].name).toBe('company.updated');
-      expect(timelineActivities[0].properties).toEqual({
-        diff: {
-          name: { before: 'Merge Window', after: 'Merge Window Twice' },
         },
       });
     });
@@ -447,8 +373,14 @@ describe('timeline activity write path (integration)', () => {
       });
 
       expect(timelineActivities).toHaveLength(1);
-      expect(timelineActivities[0].name).toBe('');
-      await expectDeprecatedNameNotToBeStored(timelineActivities[0].id);
+      expect(timelineActivities[0].timelineActivityTypeSnapshot).toMatchObject({
+        id: timelineActivityTypeIdForOrThrow(
+          'linked',
+          NOTE_UNIVERSAL_IDENTIFIER,
+        ),
+        action: 'linked',
+        objectUniversalIdentifier: NOTE_UNIVERSAL_IDENTIFIER,
+      });
       expect(timelineActivities[0].linkedRecordId).toBe(NOTE_ID);
       expect(timelineActivities[0].linkedRecordCachedName).toBe('Linked note');
       expect(timelineActivities[0].linkedObjectMetadataId).not.toBeNull();

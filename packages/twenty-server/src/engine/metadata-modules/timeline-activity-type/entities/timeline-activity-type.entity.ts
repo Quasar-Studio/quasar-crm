@@ -1,7 +1,4 @@
-import {
-  type TimelineActivityAction,
-  type TimelineActivityRenderer,
-} from 'twenty-shared/timeline';
+import { type TimelineActivityAction } from 'twenty-shared/timeline';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +7,8 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { type WasRemovedInUpgrade } from 'src/engine/core-modules/upgrade/decorators/was-removed-in-upgrade.decorator';
 
 import { SyncableEntity } from 'src/engine/workspace-manager/types/syncable-entity.interface';
 
@@ -32,18 +31,24 @@ export class TimelineActivityTypeEntity
   @Column({ nullable: false, type: 'varchar' })
   label: string;
 
-  // The verb the entry describes. Null leaves the label authoritative for a
-  // custom renderer instead of selecting built-in action copy.
+  // The verb used by automatic audit writers to resolve a type. Null leaves
+  // the type available only to explicit writers addressing its identifier.
   @Column({ nullable: true, type: 'varchar' })
   action: TimelineActivityAction | null;
 
   @Column({ nullable: true, type: 'varchar' })
   icon: string | null;
 
-  // Names the frontend component that draws the row. Null falls back to the
-  // generic renderer, which needs nothing but the label and icon.
+  // A 2.33 server still selects this column during a rolling deployment. It is
+  // no longer mapped into current metadata. The decorator and physical drop
+  // are both deferred to 2.35; the branded type lets flat builders omit it.
   @Column({ nullable: true, type: 'varchar' })
-  renderer: TimelineActivityRenderer | null;
+  renderer: WasRemovedInUpgrade<string | null>;
+
+  // App front components are the extension point for custom row presentation.
+  // The universal identifier stays stable across workspaces and app upgrades.
+  @Column({ nullable: true, type: 'uuid' })
+  frontComponentUniversalIdentifier: string | null;
 
   // The object whose records this entry is about, as a soft reference rather
   // than a relation: it is resolved through the flat maps at write time to pick

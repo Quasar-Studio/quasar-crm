@@ -9,7 +9,7 @@ import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-m
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { STANDARD_TIMELINE_ACTIVITY_RULES } from 'src/modules/timeline/constants/standard-timeline-activity-rules.constant';
 import { TimelineActivityTypeCacheService } from 'src/modules/timeline/services/timeline-activity-type-cache.service';
-import { type TimelineActivityTypeResolver } from 'src/modules/timeline/utils/resolve-timeline-activity-type-id.util';
+import { type TimelineActivityTypeResolver } from 'src/modules/timeline/utils/resolve-timeline-activity-type.util';
 import { type TimelineActivityRule } from 'src/modules/timeline/types/timeline-activity-rule.type';
 import { buildJunctionTargetShape } from 'src/modules/timeline/utils/build-junction-target-shape.util';
 import { deriveDefaultTimelineActivityRule } from 'src/modules/timeline/utils/derive-default-timeline-activity-rule.util';
@@ -23,7 +23,7 @@ type TimelineActivityRulesForEventBatch = {
   // Returned so callers reading field metadata do not fetch the cache again
   flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
   // Picks the timeline activity type stamped on the rows a rule produces
-  resolveTimelineActivityTypeId: TimelineActivityTypeResolver;
+  resolveTimelineActivityType: TimelineActivityTypeResolver;
 };
 
 @Injectable()
@@ -73,7 +73,7 @@ export class TimelineActivityRuleBuilderService {
       sourceRules,
       junctionRules,
       flatFieldMetadataMaps,
-      resolveTimelineActivityTypeId:
+      resolveTimelineActivityType:
         await this.timelineActivityTypeCacheService.getTimelineActivityTypeResolver(
           workspaceId,
         ),

@@ -2833,11 +2833,14 @@ export type MetadataTranslationProvenance = 'WORKSPACE' | 'SHIPPED' | 'INHERITED
 
 export interface TimelineActivityType {
     id: Scalars['UUID']
+    universalIdentifier: Scalars['UUID']
     name: Scalars['String']
     label: Scalars['String']
     action?: Scalars['String']
     icon?: Scalars['String']
+    /** @deprecated Use frontComponentUniversalIdentifier */
     renderer?: Scalars['String']
+    frontComponentUniversalIdentifier?: Scalars['UUID']
     objectUniversalIdentifier?: Scalars['UUID']
     applicationId?: Scalars['UUID']
     createdAt: Scalars['DateTime']
@@ -6227,11 +6230,14 @@ export interface MetadataTranslationGenqlSelection{
 
 export interface TimelineActivityTypeGenqlSelection{
     id?: boolean | number
+    universalIdentifier?: boolean | number
     name?: boolean | number
     label?: boolean | number
     action?: boolean | number
     icon?: boolean | number
+    /** @deprecated Use frontComponentUniversalIdentifier */
     renderer?: boolean | number
+    frontComponentUniversalIdentifier?: boolean | number
     objectUniversalIdentifier?: boolean | number
     applicationId?: boolean | number
     createdAt?: boolean | number

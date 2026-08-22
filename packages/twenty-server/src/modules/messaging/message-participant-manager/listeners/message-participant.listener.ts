@@ -13,7 +13,7 @@ import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/co
 import { TimelineActivityRepository } from 'src/modules/timeline/repositories/timeline-activity.repository';
 import { TimelineActivityTypeCacheService } from 'src/modules/timeline/services/timeline-activity-type-cache.service';
 import { TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
-import { resolveTimelineActivityTypeIdOrThrow } from 'src/modules/timeline/utils/resolve-timeline-activity-type-id.util';
+import { resolveTimelineActivityTypeOrThrow } from 'src/modules/timeline/utils/resolve-timeline-activity-type.util';
 
 @Injectable()
 export class MessageParticipantListener {
@@ -44,13 +44,13 @@ export class MessageParticipantListener {
         },
       });
 
-    const resolveTimelineActivityTypeId =
+    const resolveTimelineActivityType =
       await this.timelineActivityTypeCacheService.getTimelineActivityTypeResolver(
         batchEvent.workspaceId,
       );
 
-    const timelineActivityTypeId = resolveTimelineActivityTypeIdOrThrow({
-      resolveTimelineActivityTypeId,
+    const timelineActivityType = resolveTimelineActivityTypeOrThrow({
+      resolveTimelineActivityType,
       workspaceId: batchEvent.workspaceId,
       action: 'linked',
       objectUniversalIdentifier: STANDARD_OBJECTS.message.universalIdentifier,
@@ -74,8 +74,8 @@ export class MessageParticipantListener {
           }
 
           return {
-            legacyName: 'message.linked',
-            timelineActivityTypeId,
+            timelineActivityTypeId: timelineActivityType.id,
+            timelineActivityTypeSnapshot: timelineActivityType.snapshot,
             properties: {},
             objectSingularName: 'person',
             recordId: participant.personId,

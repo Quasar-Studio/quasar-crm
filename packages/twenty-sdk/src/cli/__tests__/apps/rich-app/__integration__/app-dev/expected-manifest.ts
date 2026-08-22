@@ -13,6 +13,16 @@ import {
 } from 'twenty-shared/types';
 
 export const EXPECTED_MANIFEST: Manifest = {
+  timelineActivityTypes: [
+    {
+      universalIdentifier: 'f4fa646c-6e11-4d8f-a6be-c3b7a2fc7500',
+      name: 'postCardCreated',
+      label: 'created a post card',
+      icon: 'IconMail',
+      objectUniversalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
+      frontComponentUniversalIdentifier: '88c15ae2-5f87-4a6b-b48f-1974bbe62eb7',
+    },
+  ],
   commandMenuItems: [],
   permissionFlags: [],
   pageLayouts: [],
@@ -669,6 +679,14 @@ export const EXPECTED_MANIFEST: Manifest = {
           canSoftDeleteObjectRecords: false,
           canUpdateObjectRecords: true,
           objectUniversalIdentifier: '54b589ca-eeed-4950-a176-358418b85c05',
+        },
+        {
+          universalIdentifier: 'd92786b1-eedb-50f6-9397-7a6c2591578a',
+          canDestroyObjectRecords: false,
+          canReadObjectRecords: true,
+          canSoftDeleteObjectRecords: false,
+          canUpdateObjectRecords: true,
+          objectUniversalIdentifier: '20202020-6736-4337-b5c4-8b39fae325a5',
         },
       ],
       rowLevelPermissionPredicateGroups: [],
