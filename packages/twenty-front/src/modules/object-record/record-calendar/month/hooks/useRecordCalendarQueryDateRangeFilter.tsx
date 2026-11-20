@@ -97,6 +97,9 @@ export const useRecordCalendarQueryDateRangeFilter = (
       fieldMetadataItem.id === recordIndexCalendarEndFieldMetadataId,
   );
 
+  const isDateField =
+    calendarFieldMetadataItem?.type === FieldMetadataType.DATE;
+
   const dateRangeOverlapFilter = isDefined(calendarFieldMetadataItem)
     ? getRecordCalendarDateRangeOverlapFilter({
         calendarField: calendarFieldMetadataItem,
@@ -115,9 +118,11 @@ export const useRecordCalendarQueryDateRangeFilter = (
   const dateRangeFilterAfter: RecordFilter = {
     id: DATE_RANGE_FILTER_AFTER_ID,
     fieldMetadataId: dateRangeFilterFieldMetadataId,
-    value: `${firstDayOfFirstWeekISOString}`,
+    value: isDateField
+      ? firstDayOfFirstWeek.toString()
+      : firstDayOfFirstWeekISOString,
     operand: RecordFilterOperand.IS_AFTER,
-    type: 'DATE_TIME',
+    type: isDateField ? 'DATE' : 'DATE_TIME',
     label: t`After or equal`,
     displayValue: `${firstDayOfFirstWeek.toString()}`,
   };
@@ -125,9 +130,11 @@ export const useRecordCalendarQueryDateRangeFilter = (
   const dateRangeFilterBefore: RecordFilter = {
     id: DATE_RANGE_FILTER_BEFORE_ID,
     fieldMetadataId: dateRangeFilterFieldMetadataId,
-    value: `${nextDayAfterLastDayOfLastWeekISOString}`,
+    value: isDateField
+      ? lastDayOfLastWeek.add({ days: 1 }).toString()
+      : nextDayAfterLastDayOfLastWeekISOString,
     operand: RecordFilterOperand.IS_BEFORE,
-    type: 'DATE_TIME',
+    type: isDateField ? 'DATE' : 'DATE_TIME',
     label: t`Before`,
     displayValue: `${lastDayOfLastWeek.toString()}`,
   };
