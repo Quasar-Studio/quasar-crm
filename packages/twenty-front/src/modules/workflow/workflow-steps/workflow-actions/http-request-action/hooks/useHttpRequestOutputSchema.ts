@@ -25,7 +25,10 @@ const getInitialExpectedBody = (
     return expectedOutputSchema;
   }
 
-  if (Object.keys(action.settings.outputSchema).length) {
+  if (
+    isDefined(action.settings.outputSchema) &&
+    Object.keys(action.settings.outputSchema).length
+  ) {
     return convertOutputSchemaToJson(
       action.settings.outputSchema as BaseOutputSchemaV2,
     );
