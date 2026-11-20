@@ -429,13 +429,12 @@ export const getFindDuplicatesResponse200 = (
                     type: 'object',
                     properties: {
                       hasNextPage: { type: 'boolean' },
+                      hasPreviousPage: { type: 'boolean' },
                       startCursor: {
-                        type: 'string',
-                        format: 'uuid',
+                        type: ['string', 'null'],
                       },
                       endCursor: {
-                        type: 'string',
-                        format: 'uuid',
+                        type: ['string', 'null'],
                       },
                     },
                   },
