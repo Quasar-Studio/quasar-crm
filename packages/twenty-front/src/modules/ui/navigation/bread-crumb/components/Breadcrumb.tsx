@@ -1,4 +1,5 @@
 import { MobileBreadcrumb } from '@/ui/navigation/bread-crumb/components/MobileBreadcrumb';
+import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
 import { styled } from '@linaria/react';
 import { Fragment, type ReactNode } from 'react';
@@ -51,8 +52,9 @@ const StyledDivider = styled.span`
 
 export const Breadcrumb = ({ className, links }: BreadcrumbProps) => {
   const isMobile = useIsMobile();
+  const isSettingsPage = useIsSettingsPage();
 
-  if (isMobile && links.length >= 2) {
+  if (isMobile && (links.length >= 2 || (isSettingsPage && links.length > 0))) {
     return <MobileBreadcrumb className={className} links={links} />;
   }
 
