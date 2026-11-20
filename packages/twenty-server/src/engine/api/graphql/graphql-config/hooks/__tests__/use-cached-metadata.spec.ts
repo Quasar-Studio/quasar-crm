@@ -153,13 +153,14 @@ describe('useCachedMetadata', () => {
     const request = createRequest();
     const serverContext = { req: request };
     const responseBody = { data: { views: [] } };
+    const response = Response.json(responseBody);
 
     await plugin.onRequest?.({
       endResponse: jest.fn(),
       serverContext,
     } as never);
     await plugin.onResponse?.({
-      response: Response.json(responseBody),
+      response,
       serverContext,
     } as never);
 
@@ -173,6 +174,7 @@ describe('useCachedMetadata', () => {
     expect(cacheKey).toContain('dependency-hash');
     expect(cacheKey).toContain('user-workspace-id');
     expect(cacheSetter).toHaveBeenCalledWith(cacheKey, responseBody);
+    expect(await response.json()).toEqual(responseBody);
   });
 
   it('shares cache entries across users for workspace-scoped operations', async () => {
