@@ -160,7 +160,10 @@ export class ConnectedAccountRefreshTokensService {
           return true;
         }
 
-        if (!connectedAccount.lastCredentialsRefreshedAt) {
+        if (
+          !isDefined(connectedAccount.accessToken) ||
+          !connectedAccount.lastCredentialsRefreshedAt
+        ) {
           return false;
         }
 
