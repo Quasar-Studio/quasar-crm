@@ -11,7 +11,8 @@ import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/com
 import { useContext } from 'react';
 
 export const MultiSelectFieldInput = () => {
-  const { fieldDefinition, draftValue, setDraftValue } = useMultiSelectField();
+  const { fieldDefinition, fieldValues, draftValue, setDraftValue } =
+    useMultiSelectField();
   const { addSelectOption } = useAddSelectOption(
     fieldDefinition.fieldMetadataId,
   );
@@ -38,7 +39,9 @@ export const MultiSelectFieldInput = () => {
   );
 
   const handleCancel = () => {
-    onSubmit?.({ newValue: draftValue });
+    onSubmit?.({
+      newValue: draftValue === undefined ? fieldValues : draftValue,
+    });
   };
 
   return (
