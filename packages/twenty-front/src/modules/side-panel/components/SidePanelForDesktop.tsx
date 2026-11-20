@@ -21,7 +21,12 @@ import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomStat
 import { styled } from '@linaria/react';
 import { useReducedMotion } from 'framer-motion';
 import { useStore } from 'jotai';
-import { type AnimationEvent, useCallback, useState } from 'react';
+import {
+  type AnimationEvent,
+  type TransitionEvent,
+  useCallback,
+  useState,
+} from 'react';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
 const StyledSidePanelWrapper = styled.div<{
@@ -129,6 +134,12 @@ export const SidePanelForDesktop = () => {
     handleTransitionEnd();
   };
 
+  const handleWrapperTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget && event.propertyName === 'width') {
+      handleTransitionEnd();
+    }
+  };
+
   const handleModalContainerRef = useCallback(
     (element: HTMLDivElement | null) => {
       setModalContainer(element);
@@ -176,7 +187,7 @@ export const SidePanelForDesktop = () => {
       <StyledSidePanelWrapper
         isOpen={isSidePanelOpened}
         isResizing={isResizing}
-        onTransitionEnd={handleTransitionEnd}
+        onTransitionEnd={handleWrapperTransitionEnd}
         onAnimationEnd={handleAnimationEnd}
         data-shrink-from-full-width={isShrinkingFromFullWidth}
         data-side-panel=""

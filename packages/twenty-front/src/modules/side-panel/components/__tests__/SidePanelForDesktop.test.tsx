@@ -65,6 +65,12 @@ const startHandoffShrink = () => {
   });
 };
 
+const endTransition = (element: Element, propertyName: string) => {
+  const event = new Event('transitionend', { bubbles: true });
+  Object.defineProperty(event, 'propertyName', { value: propertyName });
+  fireEvent(element, event);
+};
+
 describe('SidePanelForDesktop', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -188,9 +194,36 @@ describe('SidePanelForDesktop', () => {
     });
 
     fireEvent.animationEnd(wrapperElement);
-    fireEvent.transitionEnd(wrapperElement);
+    endTransition(wrapperElement, 'width');
 
     expect(sidePanelCloseAnimationCompleteCleanupMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for the wrapper width transition before cleaning up', () => {
+    jotaiStore.set(isSidePanelOpenedState.atom, true);
+    const { container, getByTestId, queryByTestId } = render(
+      <SidePanelForDesktop />,
+      { wrapper: Wrapper },
+    );
+    const wrapperElement = container.querySelector('[data-side-panel]');
+
+    if (wrapperElement === null) {
+      throw new Error('side panel wrapper not found');
+    }
+
+    act(() => {
+      jotaiStore.set(isSidePanelOpenedState.atom, false);
+      jotaiStore.set(isSidePanelClosingState.atom, true);
+    });
+
+    endTransition(getByTestId('side-panel-content'), 'width');
+    endTransition(wrapperElement, 'opacity');
+    expect(sidePanelCloseAnimationCompleteCleanupMock).not.toHaveBeenCalled();
+    expect(queryByTestId('side-panel-content')).toBeInTheDocument();
+
+    endTransition(wrapperElement, 'width');
+    expect(sidePanelCloseAnimationCompleteCleanupMock).toHaveBeenCalledTimes(1);
+    expect(queryByTestId('side-panel-content')).not.toBeInTheDocument();
   });
 
   it('should not shrink from full width on a normal open', () => {
