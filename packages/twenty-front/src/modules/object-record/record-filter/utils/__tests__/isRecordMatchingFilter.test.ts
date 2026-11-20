@@ -99,6 +99,46 @@ describe('isRecordMatchingFilter', () => {
   });
 
   describe('Simple Filters', () => {
+    it.each([
+      { eq: 'WORKSPACE_MEMBER' },
+      { neq: 'WORKSPACE_MEMBER' },
+      { is: 'NOT_NULL' },
+    ])('does not match a missing actor source against %p', (source) => {
+      expect(
+        isRecordMatchingFilter({
+          record: { id: companiesMock[0].id },
+          filter: { createdBy: { source } } as RecordGqlOperationFilter,
+          objectMetadataItem: companyMockObjectMetadataItem,
+          objectMetadataItems,
+        }),
+      ).toBe(false);
+    });
+
+    it('matches a null actor source against a null filter', () => {
+      expect(
+        isRecordMatchingFilter({
+          record: { id: companiesMock[0].id, createdBy: null },
+          filter: { createdBy: { source: { is: 'NULL' } } },
+          objectMetadataItem: companyMockObjectMetadataItem,
+          objectMetadataItems,
+        }),
+      ).toBe(true);
+    });
+
+    it('matches a loaded actor source', () => {
+      expect(
+        isRecordMatchingFilter({
+          record: {
+            id: companiesMock[0].id,
+            createdBy: { source: 'WORKSPACE_MEMBER' },
+          },
+          filter: { createdBy: { source: { eq: 'WORKSPACE_MEMBER' } } },
+          objectMetadataItem: companyMockObjectMetadataItem,
+          objectMetadataItems,
+        }),
+      ).toBe(true);
+    });
+
     it('matches a record with a simple equality filter on name', () => {
       const companyMockInFilter = {
         ...companiesMock[0],
