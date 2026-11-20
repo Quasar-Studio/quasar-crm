@@ -453,9 +453,15 @@ export const isRecordMatchingFilter = ({
         }
 
         if (isDefined(actorFilter.source)) {
+          const actor = record[filterKey];
+          const source = actor === null ? null : actor?.source;
+          if (source === undefined) {
+            return false;
+          }
+
           return isMatchingSelectFilter({
             selectFilter: actorFilter.source,
-            value: record[filterKey].source,
+            value: source,
           });
         }
 
