@@ -204,7 +204,7 @@ export function useCachedMetadata(config: CacheMetadataPluginConfig): Plugin {
       });
 
       if (!cachedResponse) {
-        const responseBody = await response.json();
+        const responseBody = await response.clone().json();
 
         if (responseBody.errors) {
           return;
