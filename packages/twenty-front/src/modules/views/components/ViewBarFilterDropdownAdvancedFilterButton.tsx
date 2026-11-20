@@ -36,7 +36,15 @@ const StyledPillContainer = styled.span`
   }
 `;
 
-export const ViewBarFilterDropdownAdvancedFilterButton = () => {
+const ViewBarFilterDropdownAdvancedFilterButtonContent = ({
+  currentView,
+  objectMetadataId,
+}: {
+  currentView: NonNullable<
+    ReturnType<typeof useGetCurrentViewOnly>['currentView']
+  >;
+  objectMetadataId: string;
+}) => {
   const rootRecordFilterGroup = useAtomComponentSelectorValue(
     rootLevelRecordFilterGroupComponentSelector,
   );
@@ -60,20 +68,12 @@ export const ViewBarFilterDropdownAdvancedFilterButton = () => {
 
   const { closeDropdown: closeObjectFilterDropdown } = useCloseDropdown();
 
-  const { currentView } = useGetCurrentViewOnly();
-
   const { upsertRecordFilterGroup } = useUpsertRecordFilterGroup();
 
   const { upsertRecordFilter } = useUpsertRecordFilter();
 
-  const objectMetadataId = currentView?.objectMetadataId;
-
-  if (!objectMetadataId) {
-    throw new Error('Object metadata id is missing from current view');
-  }
-
   const { objectMetadataItem } = useObjectMetadataItemById({
-    objectId: objectMetadataId ?? null,
+    objectId: objectMetadataId,
   });
 
   const availableFieldMetadataItemsForFilter = useAtomFamilySelectorValue(
@@ -156,5 +156,21 @@ export const ViewBarFilterDropdownAdvancedFilterButton = () => {
         }
       />
     </SelectableListItem>
+  );
+};
+
+export const ViewBarFilterDropdownAdvancedFilterButton = () => {
+  const { currentView } = useGetCurrentViewOnly();
+  const objectMetadataId = currentView?.objectMetadataId;
+
+  if (!currentView || !objectMetadataId) {
+    return null;
+  }
+
+  return (
+    <ViewBarFilterDropdownAdvancedFilterButtonContent
+      currentView={currentView}
+      objectMetadataId={objectMetadataId}
+    />
   );
 };
