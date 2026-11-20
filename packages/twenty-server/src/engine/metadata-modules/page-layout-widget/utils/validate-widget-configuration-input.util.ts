@@ -6,6 +6,7 @@ import { CallRecordingSummaryConfigurationDTO } from 'src/engine/metadata-module
 import { CallRecordingTranscriptConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/call-recording-transcript-configuration.dto';
 import { EmailThreadConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/email-thread-configuration.dto';
 import { FieldConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/field-configuration.dto';
+import { FieldsConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/fields-configuration.dto';
 import { FrontComponentConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/front-component-configuration.dto';
 import { IframeConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/iframe-configuration.dto';
 import { LineChartConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/line-chart-configuration.dto';
@@ -168,10 +169,11 @@ export const validateWidgetConfigurationInput = ({
       );
       break;
     case WidgetConfigurationType.FIELDS:
-      throw new PageLayoutWidgetException(
-        'Fields configuration is not supported yet',
-        PageLayoutWidgetExceptionCode.INVALID_PAGE_LAYOUT_WIDGET_DATA,
+      errors = validateWidgetConfigurationByDto(
+        FieldsConfigurationDTO,
+        configuration,
       );
+      break;
     case WidgetConfigurationType.TIMELINE:
       throw new PageLayoutWidgetException(
         'Timeline configuration is not supported yet',

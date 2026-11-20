@@ -24,6 +24,36 @@ import { WidgetConfigurationType } from 'src/engine/metadata-modules/page-layout
 import { validateWidgetConfigurationInput } from 'src/engine/metadata-modules/page-layout-widget/utils/validate-widget-configuration-input.util';
 
 describe('validateWidgetConfigurationInput', () => {
+  describe('FIELDS widget', () => {
+    it('accepts valid configuration including a nullable view', () => {
+      expect(() =>
+        validateWidgetConfigurationInput({
+          configuration: {
+            configurationType: WidgetConfigurationType.FIELDS,
+            viewId: null,
+            newFieldDefaultVisibility: true,
+            shouldAllowUserToSeeHiddenFields: false,
+          },
+        }),
+      ).not.toThrow();
+    });
+
+    it.each([
+      { viewId: 'invalid-uuid' },
+      { newFieldDefaultVisibility: 'true' },
+      { shouldAllowUserToSeeHiddenFields: 1 },
+    ])('rejects invalid fields: %p', (invalidFields) => {
+      expect(() =>
+        validateWidgetConfigurationInput({
+          configuration: {
+            configurationType: WidgetConfigurationType.FIELDS,
+            ...invalidFields,
+          },
+        }),
+      ).toThrow();
+    });
+  });
+
   describe('EMAIL_THREAD widget', () => {
     it('should not throw for valid email thread configuration', () => {
       expect(() =>
